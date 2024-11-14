@@ -1,0 +1,3 @@
+/home/apollolab/live-pose/FoundationPose/mycpp/build/CMakeFiles/rebuild_cache.dir
+/home/apollolab/live-pose/FoundationPose/mycpp/build/CMakeFiles/edit_cache.dir
+/home/apollolab/live-pose/FoundationPose/mycpp/build/CMakeFiles/mycpp.dir
