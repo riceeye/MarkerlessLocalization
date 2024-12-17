@@ -20,7 +20,7 @@ mesh_path = filedialog.askopenfilename()
 if not mesh_path:
     print("No mesh file selected")
     exit(0)
-mask_file_path = create_mask()
+mask_file_path = create_mask("Image")
 mesh = trimesh.load(mesh_path)
 to_origin, extents = trimesh.bounds.oriented_bounds(mesh)
 bbox = np.stack([-extents/2, extents/2], axis=0).reshape(2,3)

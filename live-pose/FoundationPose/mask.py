@@ -3,15 +3,15 @@ import numpy as np
 import pyrealsense2 as rs
 import time
 
-def create_mask():
+def create_mask(name):
     points = []
-    mask_path = './mask.png'
+    mask_path = './masks/mask_' + name + '.png'
 
     def select_points(event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
             points.append((x, y))
             cv2.circle(image_display, (x, y), 3, (0, 255, 0), -1)
-            cv2.imshow("Image", image_display)
+            cv2.imshow(name, image_display)
 
     def generate_mask(image, points):
         mask = np.zeros(image.shape[:2], dtype=np.uint8)
@@ -41,13 +41,13 @@ def create_mask():
         image = np.asanyarray(color_frame.get_data())
         image_display = image.copy()
 
-        cv2.namedWindow("Image")
-        cv2.setMouseCallback("Image", select_points)
+        cv2.namedWindow(name)
+        cv2.setMouseCallback(name, select_points)
 
         print("Click on the image to select points. Press Enter when done.")
 
         while True:
-            cv2.imshow("Image", image_display)
+            cv2.imshow(name, image_display)
             key = cv2.waitKey(1) & 0xFF
             if key == 13:  # Enter key
                 break

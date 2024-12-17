@@ -1,3 +1,3 @@
 #!/bin/bash
 cd FoundationPose
-python3 interactive.py
+python3 multi_pose.py
