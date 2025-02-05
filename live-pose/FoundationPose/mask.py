@@ -1,71 +1,69 @@
-## testing 
+## testing
 
 import cv2
 import numpy as np
 import pyrealsense2 as rs
+import open3d as o3d
 import time
 
-def create_mask(name):
-    points = []
-    mask_path = './masks/mask_' + name + '.png'
+def project_points(mesh, intrinsic, extrinsic):
+    vertices = np.asarray(mesh.vertices)
+    points_homogeneous = np.hstack((vertices, np.ones((vertices.shape[0], 1))))
 
-    def select_points(event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            points.append((x, y))
-            cv2.circle(image_display, (x, y), 3, (0, 255, 0), -1)
-            cv2.imshow(name, image_display)
+    camera_matrix = intrinsic @ extrinsic[:3, :]
+    projected = (camera_matrix @ points_homogeneous.T).T
 
-    def generate_mask(image, points):
-        mask = np.zeros(image.shape[:2], dtype=np.uint8)
-        points_array = np.array(points, dtype=np.int32)
-        cv2.fillPoly(mask, [points_array], 255)
-        return mask
+    # Convert from homogeneous to 2D coordinates
+    projected[:, 0] /= projected[:, 2]
+    projected[:, 1] /= projected[:, 2]
+    return projected[:, :2].astype(int)
 
-    # Configure depth and color streams
+def generate_mask_from_mesh(obj_file, name):
+    mask_path = f'./masks/mask_{name}.png'
+
+    # Load mesh
+    mesh = o3d.io.read_triangle_mesh(obj_file)
+    mesh.compute_vertex_normals()
+
+    # Configure RealSense
     pipeline = rs.pipeline()
     config = rs.config()
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-
-    # Start streaming
     pipeline.start(config)
 
     try:
-        # Wait for 1 second to allow the camera to warm up
-        time.sleep(1)
-        # Wait for a coherent pair of frames: depth and color
+        time.sleep(1)  # Allow camera to warm up
         frames = pipeline.wait_for_frames()
         color_frame = frames.get_color_frame()
-
         if not color_frame:
             raise Exception("Could not capture color frame")
 
-        # Convert image to numpy array
         image = np.asanyarray(color_frame.get_data())
-        image_display = image.copy()
+        height, width = image.shape[:2]
 
-        cv2.namedWindow(name)
-        cv2.setMouseCallback(name, select_points)
+ 
+        profile = pipeline.get_active_profile()
+        intrinsics = profile.get_stream(rs.stream.color).as_video_stream_profile().get_intrinsics()
+        intrinsic_matrix = np.array([
+            [intrinsics.fx, 0, intrinsics.ppx],
+            [0, intrinsics.fy, intrinsics.ppy],
+            [0, 0, 1]
+        ])
 
-        print("Click on the image to select points. Press Enter when done.")
+        extrinsic_matrix = np.eye(4)
 
-        while True:
-            cv2.imshow(name, image_display)
-            key = cv2.waitKey(1) & 0xFF
-            if key == 13:  # Enter key
-                break
+        projected_points = project_points(mesh, intrinsic_matrix, extrinsic_matrix)
 
-        mask = generate_mask(image, points)
+        mask = np.zeros((height, width), dtype=np.uint8)
+        cv2.fillPoly(mask, [projected_points], 255)
 
-        # Save the mask image
         cv2.imwrite(mask_path, mask)
-        cv2.destroyAllWindows()
-
         return mask_path
 
     finally:
-        # Stop streaming
         pipeline.stop()
 
 if __name__ == "__main__":
-    mask_file_path = create_mask()
+    obj_file = "path/to/your/mesh.obj"  # Replace with actual path
+    mask_file_path = generate_mask_from_mesh(obj_file, "test")
     print(f"Mask saved at: {mask_file_path}")
