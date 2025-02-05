@@ -1,3 +1,5 @@
+## testing 
+
 import cv2
 import numpy as np
 import pyrealsense2 as rs
@@ -30,7 +32,7 @@ def create_mask(name):
     try:
         # Wait for 1 second to allow the camera to warm up
         time.sleep(1)
-        # Wait for a coherent pair of frames: depth and color    
+        # Wait for a coherent pair of frames: depth and color
         frames = pipeline.wait_for_frames()
         color_frame = frames.get_color_frame()
 
