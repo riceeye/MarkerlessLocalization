@@ -7,7 +7,7 @@ import open3d as o3d
 import time
 import os
 
-
+# Takes a 3D mesh (.obj file) and converts it into 2D using the camera parameters (intrinsic and extrinsic)
 def project_points(mesh, intrinsic, extrinsic):
     vertices = np.asarray(mesh.vertices)
     points_homogeneous = np.hstack((vertices, np.ones((vertices.shape[0], 1))))
@@ -15,7 +15,7 @@ def project_points(mesh, intrinsic, extrinsic):
     camera_matrix = intrinsic @ extrinsic[:3, :]
     projected = (camera_matrix @ points_homogeneous.T).T
 
-    # Convert from homogeneous to 2D coordinates
+
     projected[:, 0] /= projected[:, 2]
     projected[:, 1] /= projected[:, 2]
     return projected[:, :2].astype(int)
