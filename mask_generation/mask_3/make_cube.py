@@ -8,6 +8,6 @@ grey_color = (128, 128, 128)  # RGB values for grey
 image = Image.new("RGB", (width, height), grey_color)
 
 # Save the image to a PNG file
-image.save("cube_texture.png")
+image.save("arm_texture.png")
 
 print("Texture file 'cube_texture.png' created successfully.")

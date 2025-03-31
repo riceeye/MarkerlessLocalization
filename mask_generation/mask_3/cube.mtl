@@ -8,4 +8,4 @@ Ks 0.500 0.500 0.500
 Ns 50.0
 d 1.0
 illum 2
-map_Kd cube_texture.png 
+map_Kd texture.png 
