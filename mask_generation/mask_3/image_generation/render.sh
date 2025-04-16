@@ -9,7 +9,7 @@
 #fi
 
 INPUT_OBJ="cube.obj"
-OUTPUT_PNG="data"
+OUTPUT_PNG="new_data"
 
 # Run the Python rendering script with the provided input and output filenames.
-python gen_mesh_5.py "$INPUT_OBJ" "$OUTPUT_PNG"
+python gen_mesh_6.py "$INPUT_OBJ" "$OUTPUT_PNG"
