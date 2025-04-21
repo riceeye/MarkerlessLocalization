@@ -21,9 +21,6 @@ from pytorch3d.renderer import (
     SoftPhongShader,
 )
 
-#######################
-# Utility Functions
-#######################
 
 def compute_bounding_sphere(mesh):
     """Computes the center and radius of the mesh in world coordinates."""
